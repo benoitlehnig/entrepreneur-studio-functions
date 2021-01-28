@@ -1,0 +1,13 @@
+{
+  "unsplash": {
+    "accesskey": "1tvDFsKncEDi7VPBlZUlh0mEgd6h-xQ0umd04AkWOkA"
+  },
+  "sendgrid": {
+    "key": "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"
+  },
+  "slack": {
+    "client_id": "1226163065714.1534441424722",
+    "client_secret": "73890a431fb427c1b9886507781cf55f",
+    "signing_secret": "f66b7e15b67fe91183a4c491de29ff6c"
+  }
+}
