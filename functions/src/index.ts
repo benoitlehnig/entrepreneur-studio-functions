@@ -9,7 +9,8 @@ sgMail.setApiKey(API_KEY);
 const urlMetadata = require('url-metadata')
 
 const fetch = require('node-fetch');
-import { URLSearchParams } from 'url';
+const url = require('url');
+
 
 let moment = require('moment');
 
@@ -17,7 +18,7 @@ let moment = require('moment');
 //unsplash
 import { createApi } from 'unsplash-js';
 const unsplash = createApi({
-	accessKey: '1tvDFsKncEDi7VPBlZUlh0mEgd6h-xQ0umd04AkWOkA',
+	accessKey: functions.config().unsplash.accesskey,
 	fetch: fetch,
 });
 
@@ -94,7 +95,7 @@ exports.updateUserPhotoUrl = functions.https.onCall((data:any, context:any) => {
 	}
 });
 
-exports.createProject =  functions.https.onCall((data:any, context:any) => {
+exports.createProject =  functions.https.onCall((data:any, context:any) => {	
 	console.log("createProject", data,   context.auth.uid);
 	data.ownerUid = context.auth.uid;
 	return admin.firestore().collection('projects').add(data).then(function(res:any){
@@ -216,7 +217,7 @@ exports.sendFeedbackEmail = functions.firestore.document('feedback/{docId}').onC
 	return "OK";
 });
 exports.suggestTool = functions.https.onCall((data:any, context:any) => {
-	console.log("suggestTool", JSON.stringify(data))
+	console.log("suggestTool", data, context.auth.email)
 	const templateId = "d-02fb4318db9b4b6798224e23cb187b0b";
 	const msg={
 		"personalizations": [
@@ -228,8 +229,8 @@ exports.suggestTool = functions.https.onCall((data:any, context:any) => {
 			}
 			],
 			"dynamic_template_data": {
-				"tool": data.tool,
-				"email": data.email
+				"tool": data,
+				"user": context.auth.email
 			},
 		}
 		],
@@ -337,7 +338,8 @@ exports.getBackgroundPictures = functions.https.onCall((data:any, context:any) =
 	});
 })
 
-exports.oauthRedirect = functions.https.onRequest(async (request:any, response:any) => {
+
+export const oauthRedirect = functions.https.onRequest(async (request:any, response:any) => {
     const {slack} = functions.config()
 
     if (!slack || !slack.client_id || !slack.client_secret) {
@@ -361,7 +363,7 @@ exports.oauthRedirect = functions.https.onRequest(async (request:any, response:a
         return response.status(401).send("Missing query attribute 'code'")
     }
 
-    const params = new URLSearchParams();
+    const params = new url.URLSearchParams()
     params.append('code', `${request.query.code}`)
     params.append('client_id', `${slack.client_id}`)
     params.append('client_secret', `${slack.client_secret}`)
@@ -394,7 +396,7 @@ export const saveNewInstallation = async (slackResultData: {
         channel_id: string
     }
 }) => {
-    return await admin.firestore().collection("installations")
+    return await admin.firestore().collection("installations/slack/teams")
         .doc(slackResultData.team.id).set({
             token: slackResultData.access_token,
             teamId: slackResultData.team.id,
