@@ -103,3 +103,34 @@ export const getBackgroundPictures = functions.https.onCall((data:any, context:a
 		}
 	});
 })
+
+
+export const getProjectAccess = functions.https.onCall(async (data:any, context:any) => {
+	console.log(" getProjectAccess" , data.projectId, context.auth);
+	let accessRights= {read:false, write:false};
+	const projectId = data.projectId;
+	const project = await db.doc('projects/'+projectId).get();
+	if(project.exists){
+		console.log(" project exists" );
+		let projectData = project?.data() ?? {accessRights: 'any'};
+		console.log(" projectData,", projectData.accessRights  );
+
+		if(projectData.sharingStatus ==='public'){
+			accessRights.read =true;
+		}
+		
+		if(context.auth !== undefined){
+			const projectUid = await db.collection('users/'+context.auth.uid+'/projects').where('projectId', '==', projectId).get();
+			console.log(" projectData projectUid,",projectUid  );
+
+			if(!projectUid.empty){
+				accessRights.write =true;
+				accessRights.read =true;
+			}
+		}
+
+
+	}
+	return accessRights;
+
+});

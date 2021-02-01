@@ -1,7 +1,9 @@
 
 
 //Slack
-export {oauthRedirect} from './extensions/slack/oauthRedirect'
+export {slackOauthRedirect} from './extensions/slack/oauthRedirect'
+export {slackInteractivity} from './extensions/slack/slackCommand'
+export {slackProjectGoPublic} from './extensions/slack/slackWebHook'
 
 
 //Communication
@@ -14,6 +16,7 @@ export {createProject} from './core/project/project'
 export {onUpdateProject} from './core/project/project'
 export {inviteTeamMember} from './core/project/project'
 export {getBackgroundPictures} from './core/project/project'
+export {getProjectAccess} from './core/project/project'
 
 //Tools
 export {suggestTool} from './core/tools/tools'

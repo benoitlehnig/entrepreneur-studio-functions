@@ -5,9 +5,11 @@ import {db} from '../../common/initFirebase'
 let moment = require('moment');
 
 
-export const oauthRedirect = functions.https.onRequest(async (request:any, response:any) => {
+export const slackOauthRedirect = functions.https.onRequest(async (request:any, response:any) => {
     const {slack} = functions.config()
-
+    console.log("oauthRedirect, ", JSON.stringify(request.query));
+   	const projectId= request.query.state;
+   	console.log("projectId", projectId)
     if (!slack || !slack.client_id || !slack.client_secret) {
         console.error("Missing slack credentials (client_id or client_secret)")
         return response.status(501).send("Missing slack credentials")
@@ -46,9 +48,11 @@ export const oauthRedirect = functions.https.onRequest(async (request:any, respo
     }
 
     const slackResultData = await result.json()
-    await saveNewInstallation(slackResultData)
+    await saveNewInstallation(slackResultData, projectId)
 
-    return response.header("Location", `https://entrepreneur-studio.com/slack/success`).send(302)
+    //console.log("slack state: ",`${slack.state}`);
+
+    return response.header("Location", `https://entrepreneur-studio.com/project/`+projectId+ '/details/executive/tabs/resources?installApp=Slack').send(302)
 })
 
 export const saveNewInstallation = async (slackResultData: {
@@ -61,12 +65,23 @@ export const saveNewInstallation = async (slackResultData: {
         url: string,
         channel_id: string
     }
-}) => {
+}, projectId:string) => {
+	let resource={
+		CMSId : 'kghp8sg4pq6zhnelpgw',
+		name : 'Slack',
+		source :  "EntrepreneurStudio",
+		title  :  'Slack',
+		url  :  'https://app.slack.com/client/'+slackResultData.team.id,
+		pictureUrl  :  'https://d34u8crftukxnk.cloudfront.net/slackpress/prod/sites/6/2019-01_BrandRefresh_slack-brand-refresh_header-1.png'
+	}
+	await db.collection("projects/"+projectId+"/resources").add(resource).then((result:any)=> {return "ok"})
+       
     return await db.collection("installations/slack/teams")
         .doc(slackResultData.team.id).set({
             token: slackResultData.access_token,
             teamId: slackResultData.team.id,
             teamName: slackResultData.team.name,
+            projectId: projectId,
             createdAt: moment()
         })
 }
