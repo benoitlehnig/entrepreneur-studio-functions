@@ -35,7 +35,7 @@ export const slackOauthRedirect = functions.https.onRequest(async (request:any, 
     params.append('code', `${request.query.code}`)
     params.append('client_id', `${slack.client_id}`)
     params.append('client_secret', `${slack.client_secret}`)
-    params.append('redirect_uri', `https://us-central1-${process.env.GCLOUD_PROJECT}.cloudfunctions.net/oauthRedirect`)
+    params.append('redirect_uri', `https://us-central1-${process.env.GCLOUD_PROJECT}.cloudfunctions.net/slackOauthRedirect`)
 
     const result = await fetch("https://slack.com/api/oauth.v2.access", {
         method: "POST",
@@ -66,6 +66,7 @@ export const saveNewInstallation = async (slackResultData: {
         channel_id: string
     }
 }, projectId:string) => {
+	console.log("saveNewInstallation",slackResultData );
 	let resource={
 		CMSId : 'kghp8sg4pq6zhnelpgw',
 		name : 'Slack',
@@ -81,7 +82,8 @@ export const saveNewInstallation = async (slackResultData: {
             token: slackResultData.access_token,
             teamId: slackResultData.team.id,
             teamName: slackResultData.team.name,
+            incoming_webhook: slackResultData.incoming_webhook,
             projectId: projectId,
-            createdAt: moment()
+            createdAt: moment().format()
         })
 }

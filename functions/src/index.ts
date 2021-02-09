@@ -4,6 +4,10 @@
 export {slackOauthRedirect} from './extensions/slack/oauthRedirect'
 export {slackInteractivity} from './extensions/slack/slackCommand'
 export {slackProjectGoPublic} from './extensions/slack/slackWebHook'
+export {slackProjectTimelineProgress} from './extensions/slack/slackWebHook'
+export {slackNewUser} from './extensions/slack/slackWebHook'
+export {slackNewSkillSearch} from './extensions/slack/slackWebHook'
+export {slackInteractiveEndPoint} from './extensions/slack/slackWebHook'
 
 
 //Communication

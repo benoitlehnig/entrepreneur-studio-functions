@@ -19,6 +19,7 @@ const unsplash = createApi({
 export const createProject =  functions.https.onCall((data:any, context:any) => {	
 	console.log("createProject", data,   context.auth.uid);
 	data.ownerUid = context.auth.uid;
+	data.creationDate = moment().format()
 	return db.collection('projects').add(data).then(function(res:any){
 		console.log(res.id);
 		return db.collection('users/'+context.auth.uid+ '/projects').add({projectId:res.id}).then(()=> {return {id:res.id, data: data}})
@@ -134,3 +135,5 @@ export const getProjectAccess = functions.https.onCall(async (data:any, context:
 	return accessRights;
 
 });
+
+

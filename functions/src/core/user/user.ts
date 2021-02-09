@@ -1,7 +1,7 @@
 import * as functions from 'firebase-functions'
 import {db,auth} from '../../common/initFirebase'
 
-export const createUser = functions.https.onCall((data:any, context:any) => {
+export const createUser = functions.https.onCall(async (data:any, context:any) => {
 	console.log("createUser", data, data.email);
 	let profileData = {
 		given_name:"",
@@ -26,11 +26,11 @@ export const createUser = functions.https.onCall((data:any, context:any) => {
 	console.log("createUser >> role", data.role )
 	if(data.role ==='incubator'){
 		console.log("createUser >> incubator", data.role )
-		return auth.setCustomUserClaims( data.uid, {incubator: true, entrepreneur:false}).then(()=>{return "OK"})
+		await auth.setCustomUserClaims( data.uid, {incubator: true, entrepreneur:false}).then(()=>{return "OK"})
 	}
 	if(data.role ==='entrepreneur'){
 		console.log("createUser >> entrepreneur", data.role )
-		return auth.setCustomUserClaims( data.uid, {incubator: false, entrepreneur:true}).then(
+		await auth.setCustomUserClaims( data.uid, {incubator: false, entrepreneur:true}).then(
 			()=>{
 				console.log("createUser >> entrepreneur >> claims DONE", data.role );
 				return "OK"
@@ -38,9 +38,12 @@ export const createUser = functions.https.onCall((data:any, context:any) => {
 	}
 
 	if(profileData !== null) {
-		return db.collection('users').doc(data.uid).set(
-			{role:data.role, projects:[],firstName:profileData.given_name, lastName:profileData.family_name, email:profileData.email,photoUrl:photoUrl })
-		.then(()=>{return "OK"})
+		console.log("profileData", JSON.stringify(profileData));
+		await db.collection('users').doc(data.uid).set(
+			{role:data.role,firstName:profileData.given_name, lastName:profileData.family_name, email:profileData.email,photoUrl:photoUrl })
+		.then(()=>{
+			console.log("create user done")
+			return "OK"})
 	}
 	return "OK";
 });
