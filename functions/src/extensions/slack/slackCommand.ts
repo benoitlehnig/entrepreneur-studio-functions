@@ -40,7 +40,8 @@ export const saveComment = async (comment:any,teamId:any, user_name:any)=> {
                 createdBy:user_name,
                 text:comment,
                 status:'received',
-                source:'slack'
+                source:'slack',
+                uid:""
             }
             console.log("saveComment, user_name, projectId", _teamIdData.projectId, JSON.stringify(newComment));
             return db.collection('projects/'+_teamIdData.projectId+'/comments').add(newComment).then(()=>{return "ok"});

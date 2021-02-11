@@ -81,3 +81,21 @@ export const updateUserPhotoUrl = functions.https.onCall((data:any, context:any)
 		return "KO";
 	}
 });
+
+export const setAdmin = functions.https.onCall(async (data:any, context:any) => {
+			console.log("setAdmin >> entrepreneur >> claims DONE", JSON.stringify(data) );
+
+	if(data.role ==='incubator'){
+		console.log("setAdmin >> incubator", data.role )
+		await auth.setCustomUserClaims( data.uid, {incubator: true, entrepreneur:false, admin:true}).then(()=>{return "OK"})
+	}
+	if(data.role ==='entrepreneur' || data.role === undefined || data.role === null){
+		console.log("setAdmin >> entrepreneur", data.role )
+		await auth.setCustomUserClaims( data.uid, {incubator: false, entrepreneur:true, admin:true}).then(
+			()=>{
+				console.log("setAdmin >> entrepreneur >> claims DONE", data.role );
+				return "OK"
+			});
+	}
+
+});

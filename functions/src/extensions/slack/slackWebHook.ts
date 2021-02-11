@@ -202,9 +202,7 @@ export const slackNewSkillSearch = functions.firestore.document('projects/{proje
 
 					]
 				}
-				console.log(JSON.stringify(payload2));
-				return webhook.send(payload2).
-
+				return webhook.send(payload2)
 			}
 			
 		}
