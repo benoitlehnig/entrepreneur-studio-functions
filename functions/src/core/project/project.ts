@@ -136,4 +136,48 @@ export const getProjectAccess = functions.https.onCall(async (data:any, context:
 
 });
 
+export const commentCreated = functions.firestore.document('projects/{projectId}/comments/{commentId}').onCreate((snap:any, context:any) => {
+	console.log("commentCreated", snap, context);
+	const docRef =db.doc('projects/'+context.params.projectId).get();
+	return docRef.then((doc:any) => {
+		if (!doc.exists) {
+			console.log('toolsNumber:No such document!');
+			return "KO";
+		} 
+		else{
+			let commentsNumber = 1;
+			if(doc.data().commentsNumber){
+				commentsNumber = Number(doc.data().commentsNumber);
+				commentsNumber++;
+			}
+			return db.doc('projects/'+context.params.projectId).update({commentsNumber: commentsNumber} ).then(()=>{return " OK"});
+		}
+
+	});
+	
+});
+export const commentDeleted = functions.firestore.document('projects/{projectId}/comments/{commentId}').onDelete((snap:any, context:any) => {
+	console.log("commentDeleted", snap, context);
+	const docRef =db.doc('projects/'+context.params.projectId).get();
+	return docRef.then((doc:any) => {
+		if (!doc.exists) {
+			console.log('toolsNumber:No such document!');
+			return "KO";
+		} 
+		else{
+			let commentsNumber = 1;
+			if(doc.data().commentsNumber){
+				commentsNumber = Number(doc.data().commentsNumber);
+				commentsNumber--;
+				if(commentsNumber <0){
+					commentsNumber = 0;
+				}
+			}
+			return db.doc('projects/'+context.params.projectId).update({commentsNumber: commentsNumber} ).then(()=>{return " OK"});
+		}
+
+	});
+	
+});
+
 

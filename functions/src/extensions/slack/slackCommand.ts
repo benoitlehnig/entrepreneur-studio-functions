@@ -10,7 +10,7 @@ export const slackInteractivity = functions.https.onRequest(async (request:any, 
     }
     response
     .status(200)
-    .send("✅  Ça arrive !")
+    .send("✅  Message envoyé !")
 
    // console.log("slackInteractivity", JSON.stringify(request));
 

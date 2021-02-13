@@ -130,7 +130,7 @@ export const slackNewUser  = functions.firestore.document('users/{userId}').onCr
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": ":clap: "+ user.firstName+" vient de rejoindre la communaute !! Welcome !"
+				"text": ":sleuth_or_spy: "+ user.firstName+" vient de rejoindre la communaute !! Welcome !"
 			}
 		}
 
@@ -145,7 +145,7 @@ export const slackNewSkillSearch = functions.firestore.document('projects/{proje
 	console.log("slackNewSkillSearch", context.params.projectId,context.params.skillSearchId, JSON.stringify(skillSearch))
 
 	const projectId = context.params.projectId;
-	let profileType="associé";
+	let profileType="associé-e";
 	if(skillSearch.type ==='partner'){profileType ="partnenaire"};
 	if(skillSearch.type ==='contributor'){profileType ="contributeur"};
 	const project =  await db.doc('projects/'+projectId).get();
@@ -169,7 +169,17 @@ export const slackNewSkillSearch = functions.firestore.document('projects/{proje
 						"type": "section",
 						"text": {
 							"type": "mrkdwn",
-							"text": ":clap: *"+ projectData.summary.name +"* recherche un/une "+ profileType +".\n "+skillSearch.freeText
+							"text": ":male-detective:  *"+ projectData.summary.name +"* recherche un/une "+ profileType +".\n "+skillSearch.freeText
+						},
+						"accessory": {
+							"type": "button",
+							"text": {
+								"type": "plain_text",
+								"emoji": true,
+								"text": "Interessé-e ! "
+							},
+							"action_id": "interested",
+							"value":  projectId+"_"+context.params.skillSearchId
 						}
 					}
 
@@ -184,7 +194,7 @@ export const slackNewSkillSearch = functions.firestore.document('projects/{proje
 						"type": "section",
 						"text": {
 							"type": "mrkdwn",
-							"text": ":clap: "+ projectData.summary.name +" recherche un/une "+ profileType +" avec les compétences suivantes : "+skillSearch.skills + ".\n "+skillSearch.freeText
+							"text": ":male-detective: *"+ projectData.summary.name +"* recherche un/une "+ profileType +" avec les compétences suivantes : "+skillSearch.skills + ".\n "+skillSearch.freeText
 						},
 						"accessory": {
 							"type": "button",
@@ -228,7 +238,30 @@ export const slackInteractiveEndPoint = functions.https.onRequest(async (request
 			container:action.container,
 			creationDate:moment().format()
 		};
-		return db.collection('projects/' +projectId+ '/skillSearches/'+searchRequestId+'/responses').add(responseSearchRequest).then(()=>{return response.sendStatus(200);});
+		return db.collection('projects/' +projectId+ '/skillSearches/'+searchRequestId+'/responses').add(responseSearchRequest).then(()=>{
+			
+			console.log("response_url ", action.response_url )
+			const webhook = new IncomingWebhook(action.response_url ); 
+			webhook.send(
+			{
+				"blocks": [
+				{
+					"type": "section",
+					"text": {
+						"type": "mrkdwn",
+						"text": "Réponse envoyée !! "
+					}
+				},
+				{
+					"type": "divider"
+				},
+
+
+				]
+			})
+
+		});
+		return response.sendStatus(200);
 	}else{
 		return response.sendStatus(200);
 	}
