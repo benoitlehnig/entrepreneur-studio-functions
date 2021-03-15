@@ -42,11 +42,33 @@ export const createUser = functions.https.onCall(async (data:any, context:any) =
 		await db.collection('users').doc(data.uid).set(
 			{role:data.role,firstName:profileData.given_name, lastName:profileData.family_name, email:profileData.email,photoUrl:photoUrl })
 		.then(()=>{
-			console.log("create user done")
-			return "OK"})
+			return  incrementUserCount(data.role);
+		})
 	}
 	return "OK";
 });
+
+export const incrementUserCount =  async (role: string) => {
+	const docRef =db.doc('ApplicationParameters/statistics').get();
+	return docRef.then((doc:any) => {
+		if (!doc.exists) {
+			console.log('statistics:No such document!');
+			return "KO";
+		} 
+		else{
+			if(role ==='incubator'){
+				let conseilUsersCount = Number(doc.data().conseilUsersCount);
+				conseilUsersCount++;
+				return db.doc('ApplicationParameters/statistics').update({conseilUsersCount: conseilUsersCount}).then(()=>{return " OK"});	
+			}
+			else{
+				let entrepreneurUsersCount = Number(doc.data().entrepreneurUsersCount);
+				entrepreneurUsersCount++;
+				return db.doc('ApplicationParameters/statistics').update({entrepreneurUsersCount: entrepreneurUsersCount}).then(()=>{return " OK"});	
+			}
+		}
+	});
+}
 
 export const initiateUser = functions.auth.user().onCreate((user:any) => {
 	console.log("initiateUser", "onCreate",user );
@@ -83,7 +105,7 @@ export const updateUserPhotoUrl = functions.https.onCall((data:any, context:any)
 });
 
 export const setAdmin = functions.https.onCall(async (data:any, context:any) => {
-			console.log("setAdmin >> entrepreneur >> claims DONE", JSON.stringify(data) );
+	console.log("setAdmin >> entrepreneur >> claims DONE", JSON.stringify(data) );
 
 	if(data.role ==='incubator'){
 		console.log("setAdmin >> incubator", data.role )

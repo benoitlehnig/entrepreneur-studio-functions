@@ -35,16 +35,16 @@ export const suggestTool = functions.https.onCall((data:any, context:any) => {
 
 export const toolCreated = functions.firestore.document('tools/{toolId}').onCreate((snap:any, context:any) => {
 	console.log("toolCreated", snap, context);
-	const docRef =db.doc('ApplicationParameters/tools').get();
+	const docRef =db.doc('ApplicationParameters/statistics').get();
 	return docRef.then((doc:any) => {
 		if (!doc.exists) {
 			console.log('toolsNumber:No such document!');
 			return "KO";
 		} 
 		else{
-			let toolNumbers = Number(doc.data().number);
+			let toolNumbers = Number(doc.data().toolsCount);
 			toolNumbers++;
-			return db.doc('ApplicationParameters/tools').update({number: toolNumbers} ).then(()=>{return " OK"});
+			return db.doc('ApplicationParameters/statistics').update({toolsCount: toolNumbers} ).then(()=>{return " OK"});
 			
 		}
 
@@ -53,16 +53,16 @@ export const toolCreated = functions.firestore.document('tools/{toolId}').onCrea
 });
 export const toolDeleted = functions.firestore.document('tools/{toolId}').onDelete((snap:any, context:any) => {
 	console.log("toolDeleted", snap, context);
-	const docRef =db.doc('ApplicationParameters/tools').get();
+	const docRef =db.doc('ApplicationParameters/statistics').get();
 	return docRef.then((doc:any) => {
 		if (!doc.exists) {
 			console.log('toolsNumber:No such document!');
 			return "KO";
 		} 
 		else{
-			let toolNumbers = Number(doc.data().number);
+			let toolNumbers = Number(doc.data().toolsCount);
 			toolNumbers--;
-			return db.doc('ApplicationParameters/tools').update({number: toolNumbers}).then(()=>{return " OK"});			
+			return db.doc('ApplicationParameters/statistics').update({toolsCount: toolNumbers}).then(()=>{return " OK"});			
 		}
 
 	});
@@ -79,8 +79,6 @@ export const toolLiked = functions.firestore.document('users/{userID}/toolLikes/
 
 		} 
 		else{
-			console.log('toolLiked: such document!');
-			console.log('toolLiked: such document!',doc.data().likes );
 			let likes =0;
 			if(doc.data().likes){
 				likes = Number(doc.data().likes) +1;

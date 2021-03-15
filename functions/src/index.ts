@@ -31,6 +31,8 @@ export {getBackgroundPictures} from './core/project/project'
 export {getProjectAccess} from './core/project/project'
 export {commentCreated} from './core/project/project'
 export {commentDeleted} from './core/project/project'
+export {projectCreated} from './core/project/project'
+export {projectDeleted} from './core/project/project'
 
 
 //Tools

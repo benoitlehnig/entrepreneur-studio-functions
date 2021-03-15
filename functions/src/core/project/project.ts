@@ -37,7 +37,41 @@ export const onUpdateProject = functions.firestore.document('projects/{projectId
 
 });
 
+export const projectCreated = functions.firestore.document('projects/{projectId}').onCreate((snap:any, context:any) => {
+	console.log("projectCreated", snap, context);
+	const docRef =db.doc('ApplicationParameters/statistics').get();
+	return docRef.then((doc:any) => {
+		if (!doc.exists) {
+			console.log('toolsNumber:No such document!');
+			return "KO";
+		} 
+		else{
+			let projectNumbers = Number(doc.data().projectsCount);
+			projectNumbers++;
+			return db.doc('ApplicationParameters/statistics').update({projectsCount: projectNumbers} ).then(()=>{return " OK"});
+			
+		}
 
+	});
+	
+});
+export const projectDeleted = functions.firestore.document('projects/{projectId}').onDelete((snap:any, context:any) => {
+	console.log("projectDeleted", snap, context);
+	const docRef =db.doc('ApplicationParameters/statistics').get();
+	return docRef.then((doc:any) => {
+		if (!doc.exists) {
+			console.log('toolsNumber:No such document!');
+			return "KO";
+		} 
+		else{
+			let projectNumbers = Number(doc.data().projectsCount);
+			projectNumbers--;
+			return db.doc('ApplicationParameters/statistics').update({projectsCount: projectNumbers}).then(()=>{return " OK"});			
+		}
+
+	});
+	
+});
 
 export const inviteTeamMember =  functions.https.onCall((data:any, context:any) => {
 	console.log("inviteTeamMember",  context.auth.uid);
