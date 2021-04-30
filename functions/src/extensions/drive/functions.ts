@@ -25,7 +25,11 @@ export const driveListFiles = functions.https.onCall( async(data:any, context:an
 			const drive = google.drive({version: 'v3', auth: oAuth2Client});
 
 			if(installationData.folderId!==null){
-				let query =  "'"+String(installationData.folderId)+"' in parents";
+				let folderId= installationData.folderId;
+				if(data.folderId !==undefined){
+					folderId = data.folderId;
+				}
+				let query =  "'"+String(folderId)+"' in parents";
 				console.log("q", query);
 				
 				const queryFolders = (driveImplementation:any) => {

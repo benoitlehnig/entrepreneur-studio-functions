@@ -42,9 +42,20 @@ export {toolDeleted} from './core/tools/tools'
 export {toolLiked} from './core/tools/tools'
 export {toolUnLiked} from './core/tools/tools'
 
+//Conseils
+export {conseilCreated} from './core/conseils/conseils'
+export {conseilDeleted} from './core/conseils/conseils'
+export {conseilUpdated} from './core/conseils/conseils'
+export {createConseilFromUser} from './core/conseils/conseils'
 
 //Users
 export {createUser} from './core/user/user'
 export {initiateUser} from './core/user/user'
 export {updateUserPhotoUrl} from './core/user/user'
 export {setAdmin} from './core/user/user'
+export {userUpdateEvent} from './core/user/user'
+
+//WordPress
+export {retrievePosts} from './wordpress/wordpress'
+
+

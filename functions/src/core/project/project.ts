@@ -3,7 +3,6 @@ import {db,auth} from '../../common/initFirebase'
 const fetch = require('node-fetch');
 
 
-
 const sgMail = require('@sendgrid/mail');
 const sendGrid_API_KEY = functions.config().sendgrid.key;
 sgMail.setApiKey(sendGrid_API_KEY);

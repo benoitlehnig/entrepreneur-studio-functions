@@ -3,6 +3,7 @@ import {db} from '../../common/initFirebase'
 let moment = require('moment');
 
 const { IncomingWebhook } = require('@slack/webhook');
+//const { WebClient } = require('@slack/web-api');
 
 export const slackProjectGoPublic  = functions.firestore.document('projects/{projectId}').onUpdate((snap:any, context:any) => {
 
@@ -116,13 +117,25 @@ export const slackNewUser  = functions.firestore.document('users/{userId}').onCr
 	const user = snap.data();
 	const {slack} = functions.config()
 	console.log("slack", slack)
-	const webhook = new IncomingWebhook(slack.slack_webhook_url);
+	const webhook = new IncomingWebhook(slack..slack_webhook_user_channel_url);
 
 	console.log(" webhook");
 	if(user.firstName ===""){
 		user.firstName = "Un nouvel utilisateur"; 
 	}
+/*
+	const web = new WebClient(slack.oauth_token);
+	try {
+		// Use the `chat.postMessage` method to send a message from this app
+		await web.chat.postMessage({
+			channel: '#general',
+			text: `The current time is ${currentTime}`,
+		});
+	} catch (error) {
+		console.log(error);
+	}
 
+*/
 	return webhook.send(
 	{
 		"blocks": [
@@ -130,7 +143,7 @@ export const slackNewUser  = functions.firestore.document('users/{userId}').onCr
 			"type": "section",
 			"text": {
 				"type": "mrkdwn",
-				"text": ":sleuth_or_spy: "+ user.firstName+" vient de rejoindre la communaute !! Welcome !"
+				"text": ":sleuth_or_spy: "+ user.firstName+" "+ user.lastName+ " "+user.email+ " vient de rejoindre la communaute !! Welcome !"
 			}
 		}
 

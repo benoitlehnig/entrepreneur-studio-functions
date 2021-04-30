@@ -1,5 +1,6 @@
 import * as functions from 'firebase-functions'
 import {db,auth} from '../../common/initFirebase'
+let moment = require('moment');
 
 export const createUser = functions.https.onCall(async (data:any, context:any) => {
 	console.log("createUser", data, data.email);
@@ -40,12 +41,37 @@ export const createUser = functions.https.onCall(async (data:any, context:any) =
 	if(profileData !== null) {
 		console.log("profileData", JSON.stringify(profileData));
 		await db.collection('users').doc(data.uid).set(
-			{role:data.role,firstName:profileData.given_name, lastName:profileData.family_name, email:profileData.email,photoUrl:photoUrl })
+			{
+				role:data.role,
+				firstName:profileData.given_name, 
+				lastName:profileData.family_name, 
+				email:profileData.email,
+				photoUrl:photoUrl,
+				creationDateTime:moment().format()
+			}
+		)
 		.then(()=>{
 			return  incrementUserCount(data.role);
 		})
 	}
 	return "OK";
+});
+
+export const userUpdateEvent = functions.firestore.document('users/{userId}').onUpdate(async (change:any, context:any) => {
+	console.log("userUpdateEvent", JSON.stringify(change.after.data()));
+	if( change.after.data().role ==='incubator'){
+		console.log('incubator',context.params.userId )
+		await auth.setCustomUserClaims( context.params.userId, {incubator: true, entrepreneur:false}).then(()=>{return "OK"})
+	}
+	if( change.after.data().role ==='entrepreneur'){
+				console.log('entrepreneur',context.params.userId )
+
+		await auth.setCustomUserClaims( context.params.userId, {incubator: false, entrepreneur:true}).then(
+			()=>{
+				return "OK"
+			});
+	}
+	
 });
 
 export const incrementUserCount =  async (role: string) => {

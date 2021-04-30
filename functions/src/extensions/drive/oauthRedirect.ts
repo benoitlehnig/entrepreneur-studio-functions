@@ -41,7 +41,7 @@ export const driveOauth2callback = functions.https.onRequest(async (request:any,
 		}
 		
 	})
-	return response.header("Location", `https://entrepreneur-studio.com/project/`+projectId+ '/details/executive/tabs/resources?installApp=Drive').send(302)
+	return response.header("Location", `https://entrepreneur-studio.com/project/`+projectId+ '/resources?installApp=Drive').send(302)
 });
 
 /**
