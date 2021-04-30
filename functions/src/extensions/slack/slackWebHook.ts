@@ -117,7 +117,7 @@ export const slackNewUser  = functions.firestore.document('users/{userId}').onCr
 	const user = snap.data();
 	const {slack} = functions.config()
 	console.log("slack", slack)
-	const webhook = new IncomingWebhook(slack..slack_webhook_user_channel_url);
+	const webhook = new IncomingWebhook(slack.slack_webhook_user_channel_url);
 
 	console.log(" webhook");
 	if(user.firstName ===""){
